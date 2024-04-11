@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biljartcompetitie Score Bijhouden</title>
+<style>
+  body {
+    font-family: 'Arial Black', Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+  }
+  .scoreboard button {
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    font-size: 24px;
+    padding: 8px 12px;
+    margin-left: 5px; /* Voeg een beetje ruimte toe tussen de knoppen */
+    float: right; /* Uitlijnen naar rechts */
+  }
+  /* Stijl voor de resetknop */
+  .scoreboard button.reset {
+    font-size: 16px; /* Kleinere lettergrootte */
+    padding: 4px 8px; /* Minder padding om kleiner te maken */
+    margin-right: 5px; /* Voeg een beetje ruimte toe aan de rechterkant van de knop */
+  }
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+  }
+  .scoreboards-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .scoreboard {
+    background-color: #333;
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    margin-right: 10px;
+    width: 550px;
+  }
+  .player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .player-name, .score {
+    font-size: 80px; /* Aangepast naar 48px voor dezelfde grootte als 'Beurten' */
+    font-weight: bold;
+  }
+  .moyenne {
+    text-align: right; /* Uitlijnen naar rechts */
+    font-size: 16px; /* Aangepast naar een geschikte lettergrootte */
+  }
+  .scoreboard:last-child {
+    margin-right: 0;
+  }
+  /* Toegevoegde stijl voor de voorstandtekst */
+  #voorstandTekst {
+    margin-top: 20px;
+    text-align: center;
+  }
+  /* Stijl voor keuzevakjes */
+  select {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 0;
+    font-size: 16px;
+    padding: 5px;
+  }
+  /* Stijl voor de voorstandtekst */
+  #voorstandTekst {
+    text-align: center;
+    margin-top: 30px; /* Verhoog de bovenmarge naar een geschikte waarde */
+    margin-bottom: 100px; /* Voeg een ondermarge toe voor betere opmaak */
+  }
+  /* Stijl voor de poedel-knop */
+  .poedel-button.clicked {
+    background-color: green;
+  }
+</style>
+
+</head>
+<body>
+<div class="container">
+  <div class="scoreboards-container">
+    <!-- Scoreboard 1 -->
+    <div id="scoreboard1" class="scoreboard">
+      <div class="player-info">
+        <label for="speler1" style="font-size: 16px;">Speler 1:</label>
+        <select id="speler1" onchange="selectSpeler('speler1')" style="font-size: 16px;">
+          <option value="">Kies een speler</option>
+          <option value="Jan">Jan</option>
+          <option value="Johannes de Boer">Johannes de Boer</option>
+          <option value="Klaas">Klaas</option>
+          <option value="Henk">Henk</option>
+        </select>
+      </div>
+      <div class="player-info">
+        <span class="player-name" id="spelerNaam1"></span> <!-- Leeg span-element -->
+        <span class="score" id="score1">0</span>
+      </div>
+      <div class="moyenne" id="moyenne1">Moyenne: 0.00</div>
+      <div>
+        <p id="percentageMoyenne1"></p>
+        <div>
+          <button onclick="updateScore('score1', 1, 'speler1')">+</button>
+          <button onclick="updateScore('score1', -1, 'speler1')">-</button>
+          <button onclick="resetScore('score1')" style="float: left; font-size: 12px;">Reset</button>
+          <button onclick="poedel('score1')" class="poedel-button" id="poedelButton1">Poedel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scoreboard 2 -->
+    <div id="scoreboard2" class="scoreboard">
+      <div class="player-info">
+        <label for="speler2" style="font-size: 16px;">Speler 2:</label>
+        <select id="speler2" onchange="selectSpeler('speler2')" style="font-size: 16px;">
+          <option value="">Kies een speler</option>
+          <option value="Jan">Jan</option>
+          <option value="Johannes de Boer">Johannes de Boer</option>
+          <option value="Klaas">Klaas</option>
+          <option value="Henk">Henk</option>
+        </select>
+      </div>
+      <div class="player-info">
+        <span class="player-name" id="spelerNaam2"></span> <!-- Leeg span-element -->
+        <span class="score" id="score2">0</span>
+      </div>
+      <div class="moyenne" id="moyenne2">Moyenne: 0.00</div>
+      <div>
+        <p id="percentageMoyenne2"></p>
+        <div>
+          <button onclick="updateScore('score2', 1, 'speler2')">+</button>
+          <button onclick="updateScore('score2', -1, 'speler2')">-</button>
+          <button onclick="resetScore('score2')" style="float: left; font-size: 12px;">Reset</button>
+          <button onclick="poedel('score2')" class="poedel-button" id="poedelButton2">Poedel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Beurt Container -->
+  <div id="beurtContainer" style="width: 420px; text-align: center; background-color: #333; color: #fff; border-radius: 10px; padding: 10px; margin-bottom: 20px; position: relative;">
+    <h2 style="margin: 0; font-size: 48px;">Beurt: <span id="beurtNummer">1</span></h2>
+    <!-- Knoppen toegevoegd voor beurt aanpassen -->
+    <button onclick="updateBeurt(1)" style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); font-size: 40px;">+</button>
+    <button onclick="updateBeurt(-1)" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); font-size: 40px;">-</button>
+  </div>
+
+  <!-- Resetknop -->
+  <button onclick="resetWedstrijd()" style="font-size: 24px;">RESET WEDSTRIJD</button>
+</div>
+
+<!-- Toegevoegd deel voor de voorstandtekst -->
+<div id="voorstandTekst" style="text-align: center; margin-top: 0px;"></div>
+
+<script>
+  function updateBeurt(amount) {
+    const beurtNummer = document.getElementById('beurtNummer');
+    let nieuweBeurt = parseInt(beurtNummer.innerText) + amount;
+    nieuweBeurt = Math.max(1, Math.min(nieuweBeurt, 30)); // Zorg ervoor dat het beurtnummer tussen 1 en 30 blijft
+    beurtNummer.innerText = nieuweBeurt;
+  }
+
+  const moyennes = { Jan: 20, 'Johannes de Boer': 30, Klaas: 40, Henk: 50 };
+
+  function selectSpeler(spelerId) {
+    const selectedPlayer = document.getElementById(spelerId).value;
+    const spelerNaamDiv = document.getElementById(`spelerNaam${spelerId.slice(-1)}`);
+
+    if (selectedPlayer) {
+      spelerNaamDiv.innerText = selectedPlayer;
+      updatePercentageMoyenne(selectedPlayer, moyennes[selectedPlayer], `percentageMoyenne${spelerId.slice(-1)}`);
+    } else {
+      spelerNaamDiv.innerText = ""; // Maak de tekst leeg als er geen speler is geselecteerd
+      document.getElementById(`percentageMoyenne${spelerId.slice(-1)}`).innerText = 'Percentage van moyenne'; // Reset het percentage als er geen speler is geselecteerd
+    }
+    updateVoorstand();
+  }
+
+  function updateScore(scoreId, value, spelerId) {
+    const score = document.getElementById(scoreId);
+    const spelerNaam = document.getElementById(`spelerNaam${spelerId.slice(-1)}`).innerText; // Haal de naam van de speler op
+
+    let punten = parseInt(score.innerText);
+    punten += value;
+    score.innerText = Math.max(0, punten);
+
+    // Bereken en update moyenne
+    const beurtNummer = parseInt(document.getElementById('beurtNummer').innerText);
+    const moyenneElement = document.querySelector(`#scoreboard${scoreId.slice(-1)} .moyenne`);
+    const moyenne = (punten / beurtNummer).toFixed(2);
+    moyenneElement.innerText = `Moyenne: ${moyenne}`;
+
+    updatePercentageMoyenne(spelerNaam, moyennes[spelerNaam], `percentageMoyenne${scoreId.slice(-1)}`);
+    updateVoorstand();
+  }
+
+function resetScore(scoreId) {
+    const score = document.getElementById(scoreId);
+    const spelerNaam = document.getElementById(`spelerNaam${scoreId.slice(-1)}`).innerText; // Haal de naam van de speler op
+
+    score.innerText = 0;
+
+    // Reset moyenne
+    const moyenneElement = document.querySelector(`#scoreboard${scoreId.slice(-1)} .moyenne`);
+    moyenneElement.innerText = 'Moyenne: 0.00';
+
+    updatePercentageMoyenne(spelerNaam, moyennes[spelerNaam], `percentageMoyenne${scoreId.slice(-1)}`);
+    updateVoorstand();
+}
+
+
+  function poedel(scoreId) {
+    // Bereken en update moyenne
+    const score = parseInt(document.getElementById(scoreId).innerText);
+    const beurtNummer = parseInt(document.getElementById('beurtNummer').innerText);
+    const moyenneElement = document.querySelector(`#scoreboard${scoreId.slice(-1)} .moyenne`);
+    const moyenne = (score / beurtNummer).toFixed(2);
+    moyenneElement.innerText = `Moyenne: ${moyenne}`;
+
+    // Voeg de klasse toe
+    const scoreButton = document.getElementById(`poedelButton${scoreId.slice(-1)}`);
+    scoreButton.classList.add('clicked');
+
+    // Verwijder de klasse na 1 seconde
+    setTimeout(() => {
+      scoreButton.classList.remove('clicked');
+    }, 1000); // 1000 milliseconden = 1 seconde
+  }
+
+function resetWedstrijd() {
+    const confirmation = confirm("Weet je zeker dat je deze wedstrijd wil resetten?");
+    if (confirmation) {
+        resetScore('score1');
+        resetScore('score2');
+        document.getElementById('speler1').selectedIndex = 0;
+        document.getElementById('speler2').selectedIndex = 0;
+        document.getElementById('spelerNaam1').innerText = '';
+        document.getElementById('spelerNaam2').innerText = '';
+        document.getElementById('beurtNummer').innerText = '1';
+        document.getElementById('voorstandTekst').innerText = '';
+    } else {
+        return false;
+    }
+}
+
+
+
+  function updatePercentageMoyenne(player, moyenne, elementId) {
+    const scoreElement = document.getElementById(`score${elementId.slice(-1)}`);
+    const score = parseInt(scoreElement.innerText);
+
+    if (player && moyenne !== undefined && moyenne !== 0) {
+      const percentage = ((score / moyenne) * 100).toFixed(2);
+      document.getElementById(elementId).innerText = `Percentage van moyenne: ${percentage}%`;
+    } else {
+      document.getElementById(elementId).innerText = 'Percentage van moyenne'; // Geef deze tekst weer als er nog geen speler is geselecteerd
+    }
+  }
+
+  function updateVoorstand() {
+    const score1 = parseInt(document.getElementById('score1').innerText);
+    const score2 = parseInt(document.getElementById('score2').innerText);
+    const speler1 = document.getElementById('speler1').value;
+    const speler2 = document.getElementById('speler2').value;
+    const moyenne1 = moyennes[speler1];
+    const moyenne2 = moyennes[speler2];
+    const voorstandTekst = document.getElementById('voorstandTekst');
+
+    if (moyenne1 !== undefined && moyenne2 !== undefined) {
+      let voorstandBericht = '';
+
+      const percentage1 = score1 / moyenne1 * 100;
+      const percentage2 = score2 / moyenne2 * 100;
+
+      if (percentage1 > percentage2) {
+        voorstandBericht = `${speler1} staat voor.`;
+      } else if (percentage2 > percentage1) {
+        voorstandBericht = `${speler2} staat voor.`;
+      } else {
+        voorstandBericht = 'De spelers staan gelijk.';
+      }
+
+      voorstandTekst.innerText = voorstandBericht;
+    } else {
+      voorstandTekst.innerText = '';
+    }
+  }
+
+  window.onload = function() {
+    selectSpeler('speler1'); // Roept de selectSpeler-functie aan voor de eerste speler
+    selectSpeler('speler2'); // Roept de selectSpeler-functie aan voor de tweede speler
+  };
+</script>
+</body>
+</html>
